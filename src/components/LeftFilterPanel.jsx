@@ -12,7 +12,9 @@ const LeftFilterPanel = ({ isCollapsed, setIsCollapsed }) => {
     severity: searchParams.getAll('sev').length ? searchParams.getAll('sev') : ['Mild', 'Moderate', 'Severe'],
     confidence: parseInt(searchParams.get('conf') || '60', 10),
     reports: parseInt(searchParams.get('rep') || '3', 10),
-    vehicles: searchParams.getAll('veh').length ? searchParams.getAll('veh') : ['Sedan', 'SUV', 'Truck', 'Motorcycle', 'Mixed']
+    vehicles: searchParams.getAll('veh').length ? searchParams.getAll('veh') : ['Sedan', 'SUV', 'Truck', 'Motorcycle', 'Mixed'],
+    startDate: searchParams.get('start') || '',
+    endDate: searchParams.get('end') || ''
   };
 
   // Track which sections are expanded
@@ -21,7 +23,8 @@ const LeftFilterPanel = ({ isCollapsed, setIsCollapsed }) => {
     severity: true,
     confidence: true,
     reports: false,
-    vehicles: false
+    vehicles: false,
+    date: true
   });
 
   const toggleSection = (section) => {
@@ -45,7 +48,11 @@ const LeftFilterPanel = ({ isCollapsed, setIsCollapsed }) => {
 
   const handleRangeChange = (paramKey, value) => {
     const params = new URLSearchParams(window.location.search);
-    params.set(paramKey, value);
+    if (value === '') {
+      params.delete(paramKey);
+    } else {
+      params.set(paramKey, value);
+    }
     setSearchParams(params, { replace: true });
   };
 
@@ -57,6 +64,8 @@ const LeftFilterPanel = ({ isCollapsed, setIsCollapsed }) => {
       params.delete('conf');
       params.delete('rep');
       params.delete('veh');
+      params.delete('start');
+      params.delete('end');
       setSearchParams(params, { replace: true });
     }
   };
@@ -184,6 +193,38 @@ const LeftFilterPanel = ({ isCollapsed, setIsCollapsed }) => {
                       <span>{v}</span>
                     </label>
                   ))}
+                </div>
+              )}
+            </div>
+
+            {/* Date Range */}
+            <div className="filter-section">
+              <button className="section-header" onClick={() => toggleSection('date')}>
+                <h3>Date Range</h3>
+                {expandedSections.date ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </button>
+              {expandedSections.date && (
+                <div className="section-body date-inputs">
+                  <div className="date-input-group">
+                    <label htmlFor="start-date">Start Date</label>
+                    <input 
+                      id="start-date"
+                      type="date" 
+                      value={filters.startDate}
+                      onChange={(e) => handleRangeChange('start', e.target.value)}
+                      className="date-picker"
+                    />
+                  </div>
+                  <div className="date-input-group">
+                    <label htmlFor="end-date">End Date</label>
+                    <input 
+                      id="end-date"
+                      type="date" 
+                      value={filters.endDate}
+                      onChange={(e) => handleRangeChange('end', e.target.value)}
+                      className="date-picker"
+                    />
+                  </div>
                 </div>
               )}
             </div>

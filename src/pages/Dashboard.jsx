@@ -83,6 +83,9 @@ const Dashboard = () => {
     const allowedVehicles = searchParams.getAll('veh');
     const vehicles = allowedVehicles.length ? allowedVehicles : ['Sedan', 'SUV', 'Truck', 'Motorcycle', 'Mixed'];
 
+    const startDate = searchParams.get('start') || '';
+    const endDate = searchParams.get('end') || '';
+
     return rawPoints.filter(pt => {
       // Filter by Type
       if (!types.includes(pt.type)) return false;
@@ -99,9 +102,27 @@ const Dashboard = () => {
       // Filter by Vehicle Type
       if (vehicles.length > 0 && !vehicles.includes('Mixed') && !vehicles.includes(pt.vehicle)) return false;
 
+      // Filter by Date Range
+      if (startDate && pt.date < startDate) return false;
+      if (endDate && pt.date > endDate) return false;
+
       return true;
     });
   }, [rawPoints, searchParams]);
+
+  // Filter trip segments by Date Range
+  const filteredTripSegments = useMemo(() => {
+    const startDate = searchParams.get('start') || '';
+    const endDate = searchParams.get('end') || '';
+
+    return tripSegments.filter(segment => {
+      const segDate = segment.properties.date;
+      if (!segDate) return true;
+      if (startDate && segDate < startDate) return false;
+      if (endDate && segDate > endDate) return false;
+      return true;
+    });
+  }, [tripSegments, searchParams]);
 
   return (
     <>
@@ -126,7 +147,7 @@ const Dashboard = () => {
             onDefectClick={handleDefectClick}
             isLeftPanelCollapsed={isLeftPanelCollapsed}
             points={filteredPoints}
-            tripSegments={tripSegments}
+            tripSegments={filteredTripSegments}
           />
         ) : (
           <TableView 

@@ -196,7 +196,8 @@ export function processDefectData(inferredLanes = [], trips = []) {
           properties: {
             tripId: trip.id,
             severity: currentSeverity,
-            color: currentColor
+            color: currentColor,
+            date: parseFirestoreDate(trip.startTimeMs)
           }
         });
         currentSegment = [[lng, lat]];
@@ -218,7 +219,8 @@ export function processDefectData(inferredLanes = [], trips = []) {
         properties: {
           tripId: trip.id,
           severity: currentSeverity,
-          color: currentColor
+          color: currentColor,
+          date: parseFirestoreDate(trip.startTimeMs)
         }
       });
     }
