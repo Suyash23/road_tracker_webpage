@@ -81,7 +81,13 @@ const Dashboard = () => {
     const minReports = parseInt(searchParams.get('rep') || '3', 10);
     
     const allowedVehicles = searchParams.getAll('veh');
-    const vehicles = allowedVehicles.length ? allowedVehicles : ['Sedan', 'SUV', 'Truck', 'Motorcycle', 'Mixed'];
+    const vehicles = allowedVehicles.length ? allowedVehicles : ['Tesla Model Y', 'Lucid Gravity'];
+
+    const allowedMounts = searchParams.getAll('mount');
+    const mounts = allowedMounts.length ? allowedMounts : ['Stiff Mount', 'Wobbly Mount', 'Cup Holder (No Mount)'];
+
+    const allowedScenarios = searchParams.getAll('scenario');
+    const scenarios = allowedScenarios.length ? allowedScenarios : ['Normal Drive', 'Sudden Braking', 'Device Tapping'];
 
     const startDate = searchParams.get('start') || '';
     const endDate = searchParams.get('end') || '';
@@ -99,8 +105,14 @@ const Dashboard = () => {
       // Filter by Min Reports
       if (pt.reports < minReports) return false;
 
-      // Filter by Vehicle Type
-      if (vehicles.length > 0 && !vehicles.includes('Mixed') && !vehicles.includes(pt.vehicle)) return false;
+      // Filter by Vehicle Model
+      if (vehicles.length > 0 && !vehicles.includes(pt.vehicle)) return false;
+
+      // Filter by Phone Mount Type
+      if (mounts.length > 0 && pt.mountType && !mounts.includes(pt.mountType)) return false;
+
+      // Filter by Drive Scenario
+      if (scenarios.length > 0 && pt.scenario && !scenarios.includes(pt.scenario)) return false;
 
       // Filter by Date Range
       if (startDate && pt.date < startDate) return false;
@@ -110,16 +122,34 @@ const Dashboard = () => {
     });
   }, [rawPoints, searchParams]);
 
-  // Filter trip segments by Date Range
+  // Filter trip segments by Date Range, Vehicle, Mount Type, and Scenario
   const filteredTripSegments = useMemo(() => {
+    const allowedVehicles = searchParams.getAll('veh');
+    const vehicles = allowedVehicles.length ? allowedVehicles : ['Tesla Model Y', 'Lucid Gravity'];
+
+    const allowedMounts = searchParams.getAll('mount');
+    const mounts = allowedMounts.length ? allowedMounts : ['Stiff Mount', 'Wobbly Mount', 'Cup Holder (No Mount)'];
+
+    const allowedScenarios = searchParams.getAll('scenario');
+    const scenarios = allowedScenarios.length ? allowedScenarios : ['Normal Drive', 'Sudden Braking', 'Device Tapping'];
+
     const startDate = searchParams.get('start') || '';
     const endDate = searchParams.get('end') || '';
 
     return tripSegments.filter(segment => {
       const segDate = segment.properties.date;
-      if (!segDate) return true;
-      if (startDate && segDate < startDate) return false;
-      if (endDate && segDate > endDate) return false;
+      if (startDate && segDate && segDate < startDate) return false;
+      if (endDate && segDate && segDate > endDate) return false;
+
+      const segVehicle = segment.properties.vehicle;
+      if (segVehicle && !vehicles.includes(segVehicle)) return false;
+
+      const segMount = segment.properties.mountType;
+      if (segMount && !mounts.includes(segMount)) return false;
+
+      const segScenario = segment.properties.scenario;
+      if (segScenario && !scenarios.includes(segScenario)) return false;
+
       return true;
     });
   }, [tripSegments, searchParams]);

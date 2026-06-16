@@ -104,7 +104,9 @@ export function processDefectData(inferredLanes = [], trips = []) {
         type: anomaly.isAnomalous ? 'Unverified' : type,
         confidence: anomaly.isAnomalous ? 10 : confidence, // Low confidence for warnings
         reports: anomaly.isAnomalous ? 1 : reports,
-        vehicle: vehicles,
+        vehicle: 'Tesla Model Y',
+        mountType: 'Stiff Mount',
+        scenario: 'Normal Drive',
         date: parseFirestoreDate(lane.generated_at),
         source: 'inferred_lanes',
         docId: lane.id,
@@ -155,7 +157,10 @@ export function processDefectData(inferredLanes = [], trips = []) {
       const coordSeed = Math.abs(Math.sin(lat * 1000 + lng * 1000));
       const confidence = Math.floor(65 + coordSeed * 34);
       const reports = Math.floor(1 + coordSeed * 10);
-      const vehicle = ['Sedan', 'SUV', 'Truck', 'Motorcycle'][Math.floor(coordSeed * 4)];
+      
+      const vehicleVal = trip.vehicle || 'Tesla Model Y';
+      const mountVal = trip.mountType || 'Stiff Mount';
+      const scenarioVal = trip.scenario || 'Normal Drive';
 
       const anomaly = detectAnomaly(lat, lng, val);
 
@@ -170,7 +175,9 @@ export function processDefectData(inferredLanes = [], trips = []) {
         type: anomaly.isAnomalous ? 'Unverified' : type,
         confidence: anomaly.isAnomalous ? 10 : confidence,
         reports: anomaly.isAnomalous ? 1 : reports,
-        vehicle,
+        vehicle: vehicleVal,
+        mountType: mountVal,
+        scenario: scenarioVal,
         date: parseFirestoreDate(trip.startTimeMs),
         source: 'trip',
         docId: trip.id,
@@ -197,7 +204,10 @@ export function processDefectData(inferredLanes = [], trips = []) {
             tripId: trip.id,
             severity: currentSeverity,
             color: currentColor,
-            date: parseFirestoreDate(trip.startTimeMs)
+            date: parseFirestoreDate(trip.startTimeMs),
+            vehicle: trip.vehicle || 'Tesla Model Y',
+            mountType: trip.mountType || 'Stiff Mount',
+            scenario: trip.scenario || 'Normal Drive'
           }
         });
         currentSegment = [[lng, lat]];
@@ -220,7 +230,10 @@ export function processDefectData(inferredLanes = [], trips = []) {
           tripId: trip.id,
           severity: currentSeverity,
           color: currentColor,
-          date: parseFirestoreDate(trip.startTimeMs)
+          date: parseFirestoreDate(trip.startTimeMs),
+          vehicle: trip.vehicle || 'Tesla Model Y',
+          mountType: trip.mountType || 'Stiff Mount',
+          scenario: trip.scenario || 'Normal Drive'
         }
       });
     }
@@ -250,6 +263,8 @@ export function pointsToGeoJSON(points = []) {
         confidence: pt.confidence,
         reports: pt.reports,
         vehicle: pt.vehicle,
+        mountType: pt.mountType,
+        scenario: pt.scenario,
         date: pt.date,
         source: pt.source
       }

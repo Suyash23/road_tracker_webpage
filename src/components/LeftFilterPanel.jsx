@@ -12,7 +12,9 @@ const LeftFilterPanel = ({ isCollapsed, setIsCollapsed }) => {
     severity: searchParams.getAll('sev').length ? searchParams.getAll('sev') : ['Mild', 'Moderate', 'Severe'],
     confidence: parseInt(searchParams.get('conf') || '60', 10),
     reports: parseInt(searchParams.get('rep') || '3', 10),
-    vehicles: searchParams.getAll('veh').length ? searchParams.getAll('veh') : ['Sedan', 'SUV', 'Truck', 'Motorcycle', 'Mixed'],
+    vehicles: searchParams.getAll('veh').length ? searchParams.getAll('veh') : ['Tesla Model Y', 'Lucid Gravity'],
+    mounts: searchParams.getAll('mount').length ? searchParams.getAll('mount') : ['Stiff Mount', 'Wobbly Mount', 'Cup Holder (No Mount)'],
+    scenarios: searchParams.getAll('scenario').length ? searchParams.getAll('scenario') : ['Normal Drive', 'Sudden Braking', 'Device Tapping'],
     startDate: searchParams.get('start') || '',
     endDate: searchParams.get('end') || ''
   };
@@ -24,6 +26,8 @@ const LeftFilterPanel = ({ isCollapsed, setIsCollapsed }) => {
     confidence: true,
     reports: false,
     vehicles: false,
+    mounts: false,
+    scenarios: false,
     date: true
   });
 
@@ -33,12 +37,23 @@ const LeftFilterPanel = ({ isCollapsed, setIsCollapsed }) => {
 
   // Safe parameters updater
   const handleCheckboxChange = (category, value) => {
-    const current = filters[category === 'severity' ? 'severity' : category === 'vehicles' ? 'vehicles' : 'type'];
+    const current = filters[
+      category === 'severity' ? 'severity'
+      : category === 'vehicles' ? 'vehicles'
+      : category === 'mounts' ? 'mounts'
+      : category === 'scenarios' ? 'scenarios'
+      : 'type'
+    ];
     const updated = current.includes(value) 
       ? current.filter(item => item !== value)
       : [...current, value];
 
-    const paramKey = category === 'severity' ? 'sev' : category === 'vehicles' ? 'veh' : 'type';
+    const paramKey = 
+      category === 'severity' ? 'sev'
+      : category === 'vehicles' ? 'veh'
+      : category === 'mounts' ? 'mount'
+      : category === 'scenarios' ? 'scenario'
+      : 'type';
     
     const params = new URLSearchParams(window.location.search);
     params.delete(paramKey);
@@ -64,6 +79,8 @@ const LeftFilterPanel = ({ isCollapsed, setIsCollapsed }) => {
       params.delete('conf');
       params.delete('rep');
       params.delete('veh');
+      params.delete('mount');
+      params.delete('scenario');
       params.delete('start');
       params.delete('end');
       setSearchParams(params, { replace: true });
@@ -178,12 +195,12 @@ const LeftFilterPanel = ({ isCollapsed, setIsCollapsed }) => {
             {/* Vehicles */}
             <div className="filter-section">
               <button className="section-header" onClick={() => toggleSection('vehicles')}>
-                <h3>Vehicle Types</h3>
+                <h3>Vehicle Models</h3>
                 {expandedSections.vehicles ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
               </button>
               {expandedSections.vehicles && (
                 <div className="section-body">
-                  {['Sedan', 'SUV', 'Truck', 'Motorcycle', 'Mixed'].map(v => (
+                  {['Tesla Model Y', 'Lucid Gravity'].map(v => (
                     <label key={v} className="checkbox-label">
                       <input 
                         type="checkbox" 
@@ -191,6 +208,50 @@ const LeftFilterPanel = ({ isCollapsed, setIsCollapsed }) => {
                         onChange={() => handleCheckboxChange('vehicles', v)}
                       />
                       <span>{v}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Phone Mounts */}
+            <div className="filter-section">
+              <button className="section-header" onClick={() => toggleSection('mounts')}>
+                <h3>Phone Mount Type</h3>
+                {expandedSections.mounts ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </button>
+              {expandedSections.mounts && (
+                <div className="section-body">
+                  {['Stiff Mount', 'Wobbly Mount', 'Cup Holder (No Mount)'].map(m => (
+                    <label key={m} className="checkbox-label">
+                      <input 
+                        type="checkbox" 
+                        checked={filters.mounts.includes(m)}
+                        onChange={() => handleCheckboxChange('mounts', m)}
+                      />
+                      <span>{m}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Scenarios */}
+            <div className="filter-section">
+              <button className="section-header" onClick={() => toggleSection('scenarios')}>
+                <h3>Drive Scenarios</h3>
+                {expandedSections.scenarios ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </button>
+              {expandedSections.scenarios && (
+                <div className="section-body">
+                  {['Normal Drive', 'Sudden Braking', 'Device Tapping'].map(s => (
+                    <label key={s} className="checkbox-label">
+                      <input 
+                        type="checkbox" 
+                        checked={filters.scenarios.includes(s)}
+                        onChange={() => handleCheckboxChange('scenarios', s)}
+                      />
+                      <span>{s}</span>
                     </label>
                   ))}
                 </div>

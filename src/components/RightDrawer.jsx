@@ -20,7 +20,9 @@ const RightDrawer = ({ isOpen, setIsOpen, defect, onTelemetryPruned }) => {
   const reports = defect.reports || 3;
   const severity = defect.severity || 'Mild';
   const type = defect.type || 'Pothole';
-  const vehicle = defect.vehicle || 'SUV';
+  const vehicle = defect.vehicle || 'Tesla Model Y';
+  const mountType = defect.mountType || 'Stiff Mount';
+  const scenario = defect.scenario || 'Normal Drive';
 
   // Vehicle mix mock generator for variety
   const getVehicleMix = (v) => {
@@ -103,6 +105,23 @@ const RightDrawer = ({ isOpen, setIsOpen, defect, onTelemetryPruned }) => {
 
       <div className="drawer-content">
         <div className="telemetry-id">RECORD ID: {defect.id}</div>
+
+        <div className="telemetry-metadata glass">
+          <div className="meta-grid">
+            <div className="meta-item">
+              <span className="meta-lbl">VEHICLE</span>
+              <span className="meta-val" title={vehicle}>{vehicle}</span>
+            </div>
+            <div className="meta-item">
+              <span className="meta-lbl">MOUNT TYPE</span>
+              <span className="meta-val" title={mountType}>{mountType}</span>
+            </div>
+            <div className="meta-item">
+              <span className="meta-lbl">SCENARIO</span>
+              <span className="meta-val" title={scenario}>{scenario}</span>
+            </div>
+          </div>
+        </div>
 
         {/* ⚠️ HIGH VISIBILITY ANOMALY ALERT BANNER ⚠️ */}
         {defect.isAnomalous && (

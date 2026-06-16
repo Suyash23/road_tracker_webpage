@@ -8,7 +8,7 @@ const TableView = ({ onDefectClick, points = [] }) => {
   const handleExportCSV = () => {
     if (points.length === 0) return alert("No data to export");
 
-    const headers = ['ID', 'Type', 'Severity', 'Confidence', 'Reports', 'Latitude', 'Longitude', 'Vehicle Type', 'Date', 'Source'];
+    const headers = ['ID', 'Type', 'Severity', 'Confidence', 'Reports', 'Latitude', 'Longitude', 'Vehicle Model', 'Mount Type', 'Scenario', 'Date', 'Source'];
     const rows = points.map(pt => [
       pt.id,
       pt.type,
@@ -18,6 +18,8 @@ const TableView = ({ onDefectClick, points = [] }) => {
       pt.lat,
       pt.lng,
       pt.vehicle,
+      pt.mountType || 'Stiff Mount',
+      pt.scenario || 'Normal Drive',
       pt.date,
       pt.source
     ]);
@@ -79,7 +81,9 @@ const TableView = ({ onDefectClick, points = [] }) => {
                 <th scope="col">Confidence</th>
                 <th scope="col">Reports</th>
                 <th scope="col">Coordinates</th>
-                <th scope="col">Vehicle Mix</th>
+                <th scope="col">Vehicle Model</th>
+                <th scope="col">Mount Type</th>
+                <th scope="col">Scenario</th>
                 <th scope="col">Last Updated</th>
                 <th scope="col">Action</th>
               </tr>
@@ -98,6 +102,8 @@ const TableView = ({ onDefectClick, points = [] }) => {
                   <td>{row.reports}</td>
                   <td>{row.lat.toFixed(4)}, {row.lng.toFixed(4)}</td>
                   <td>{row.vehicle}</td>
+                  <td>{row.mountType || 'Stiff Mount'}</td>
+                  <td>{row.scenario || 'Normal Drive'}</td>
                   <td>{row.date}</td>
                   <td>
                     <button 
